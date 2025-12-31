@@ -1,13 +1,32 @@
+from .models import *
+from .serializers import *
+
 from rest_framework.generics import GenericAPIView 
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.response import Response
+from rest_framework.views import APIView
 from rest_framework import status 
 
 from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.shortcuts import get_object_or_404
-from .models import *
-from .serializers import *
+
+
+class create_auction_view(APIView) :
+    def post(self, request) :
+        serializer = auction_serializer(data = request.data)
+        if serializer.is_valid() :
+
+            start_date = serializer.validated_data["start_date"]
+            ends_date = serializer.validated_data["ends_date"]
+
+            if ends_date >= start_date :
+                return Response({"error":"ends date should be great than start date"})
+            
+            serializer.save(created_by=request.user)
+            return Response(serializer.data , status=201)
+        
+        return Response(serializer.errors , status=400)
 
 
 class palce_bid(GenericAPIView , CreateModelMixin) :
