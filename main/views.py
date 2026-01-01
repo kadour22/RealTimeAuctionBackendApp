@@ -11,14 +11,13 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.shortcuts import get_object_or_404
 
-
 class create_auction_view(APIView) :
     def post(self, request) :
         serializer = auction_serializer(data = request.data)
         if serializer.is_valid() :
 
             start_date = serializer.validated_data["start_date"]
-            ends_date = serializer.validated_data["ends_date"]
+            ends_date  = serializer.validated_data["ends_date"]
 
             if ends_date >= start_date :
                 return Response({"error":"ends date should be great than start date"})

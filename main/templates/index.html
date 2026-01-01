@@ -1,0 +1,15 @@
+<script>
+    const socket = new WebSocket("ws://127.0.0.1:8000/ws/auction/1/");
+
+    socket.onopen = () => console.log("Connected");
+    socket.onmessage = (e) => console.log("Message:", e.data);
+    socket.onerror = (e) => console.error("Error:", e);
+    socket.onclose = () => console.log("Closed");
+
+</script>
+
+
+<form action="" method="post">
+    {% csrf_token %}
+    <button type="submit">test</button>
+</form>
