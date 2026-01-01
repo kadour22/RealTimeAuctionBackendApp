@@ -10,3 +10,10 @@ class bid_serializer(serializers.ModelSerializer) :
     class Meta :
         model = Bid
         fields= "__all__"
+
+class products_serializer(serializers.ModelSerializer) :
+    class Meta :
+        model = Product
+        fields = [
+            "name", "price", "image", "description"
+        ]
