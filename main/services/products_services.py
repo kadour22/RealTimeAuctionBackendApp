@@ -12,3 +12,8 @@ def create_product(name, price, image, description) :
     return Response(
         product , status=201
     )
+
+def delete_product(product_id) :
+    product = Product.objects.get(id=product_id) 
+    product.delete()
+    return Response({"message :":f"product with ID : {product_id} deleted"})
