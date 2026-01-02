@@ -1,8 +1,5 @@
 from .models import *
 from .serializers import *
-from .services.products_services import (
-    create_product, delete_product, get_product_by_id
-)
 from rest_framework.generics import GenericAPIView 
 from rest_framework.mixins import CreateModelMixin
 from rest_framework.views import APIView
@@ -13,6 +10,24 @@ from channels.layers import get_channel_layer
 from asgiref.sync import async_to_sync
 from django.shortcuts import get_object_or_404
 
+class product_view_services(GenericAPIView , CreateModelMixin):
+    serializer_class = products_serializer
+    def post(self, request) :
+        serializer = self.get_serializer()
+        if serializer.is_valid() :
+            serializer.save()
+            return Response(serializer.data , status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=400)
+    
+    def delete(self, request, product_id) :
+        product = get_object_or_404(Product, id=product_id)
+        product.delete()
+        return Response({"message":f"{product.name} deleted"},status=200)
+
+    def get(self, request, product_id) :
+        product = get_object_or_404(Product, id=product_id)
+        serializer = self.get_serializer(product,many=False)
+        return Response(serializer.data,status=200)
 
 
 class create_auction_view(APIView) :
