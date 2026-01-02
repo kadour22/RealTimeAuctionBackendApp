@@ -1,10 +1,12 @@
 from .models import *
 from .serializers import *
-
+from .services.products_services import (
+    create_product, delete_product, get_product_by_id
+)
 from rest_framework.generics import GenericAPIView 
 from rest_framework.mixins import CreateModelMixin
-from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.response import Response
 from rest_framework import status 
 
 from channels.layers import get_channel_layer

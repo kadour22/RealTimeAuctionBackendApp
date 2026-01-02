@@ -23,4 +23,4 @@ def get_product_by_id(product_id) :
         product = Product.objects.get(id=product_id) 
         return Response({"data":product}, status=200)
     except Product.DoesNotExist :
-        return Response({"error":"product with ID : {product_id} is not available"}) 
+        return Response({"error":"product with ID : {product_id} is not available"})
