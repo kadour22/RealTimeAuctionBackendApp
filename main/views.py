@@ -45,28 +45,31 @@ class create_auction_view(APIView) :
             return Response(serializer.data , status=201)
         
         return Response(serializer.errors , status=400)
+    
     def get(self, request) :
         auctions = Auction.objects.all()
         serializer = auction_serializer(auctions , many=True)
         return Response(serializer.data , status=200)
+
 class auction_detail_view(APIView) :
     def get(self, request, auction_id) :
         auction = get_object_or_404(Auction , id=auction_id)
         serializer = auction_serializer(auction , many=False)
         return Response(serializer.data , status=200)
 
-class palce_bid(GenericAPIView , CreateModelMixin) :
-    serializer_class = bid_serializer
-    # renderer_classes = [ ]
+class palce_bid(APIView) :
+    
     def post(self, request, auction_id) :
-       
         auction = get_object_or_404(Auction , id=auction_id)
-        serializer = self.get_serializer(data=request.data)
+        serializer = bid_serializer(data=request.data)
+
         if serializer.is_valid() :
-            
-            amount = serializer.validated_data["amount"]     
+
+            amount = serializer.validated_data["amount"]   
+
             try :
-                bid = auction.place_bid(request.user , amount)
+                bid = auction.place_bid(user=request.user , amount=amount)
+                print(bid)
             except ValueError as e :
                 return Response({"error":str(e)} , status=status.HTTP_400_BAD_REQUEST)
             # broadcast the new bid to the auction group
@@ -75,9 +78,9 @@ class palce_bid(GenericAPIView , CreateModelMixin) :
                 f"auction_{auction.id}",{
                     "type":"new_bid",
                     "auction_id":auction.id ,
-                    "user":request.user
+                    "user":request.user.username
                 }
             )
-            
-            return Response("bid created.." , status=status.HTTP_201_CREATED)
-        return Response(serializer.errors , status=status.HTTP_404_NOT_FOUND)
+
+            return Response(bid_serializer(bid).data , status=status.HTTP_201_CREATED)
+        return Response(serializer.errors , status=status.HTTP_400_BAD_REQUEST)
