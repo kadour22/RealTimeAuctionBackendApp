@@ -21,14 +21,13 @@ class create_product(GenericAPIView , CreateModelMixin):
 
 class get_or_delete_product(APIView) :
     def delete(self,request,product_id):
-        product = get_object_or_404(id=product_id)
+        product = get_object_or_404(Product,id=product_id)
         product.delete()
         return Response({"message":"product deleted"},status=200)
     def get(self,request,product_id):
-        product = get_object_or_404(id=product_id)
+        product = get_object_or_404(Product,id=product_id)
         serializer = products_serializer(product,many=False)
         return Response(serializer.data, status=200)
-
 
 
 class create_auction_view(APIView) :
@@ -46,7 +45,15 @@ class create_auction_view(APIView) :
             return Response(serializer.data , status=201)
         
         return Response(serializer.errors , status=400)
-
+    def get(self, request) :
+        auctions = Auction.objects.all()
+        serializer = auction_serializer(auctions , many=True)
+        return Response(serializer.data , status=200)
+class auction_detail_view(APIView) :
+    def get(self, request, auction_id) :
+        auction = get_object_or_404(Auction , id=auction_id)
+        serializer = auction_serializer(auction , many=False)
+        return Response(serializer.data , status=200)
 
 class palce_bid(GenericAPIView , CreateModelMixin) :
     serializer_class = bid_serializer
@@ -54,10 +61,10 @@ class palce_bid(GenericAPIView , CreateModelMixin) :
     def post(self, request, auction_id) :
        
         auction = get_object_or_404(Auction , id=auction_id)
-        serializer = serializers.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid() :
             
-            amount = serializers.validated_data["amount"]     
+            amount = serializer.validated_data["amount"]     
             if amount <= auction.current_price :
                 return Response({
                     "error" : "amount should be great than current place"
@@ -66,7 +73,7 @@ class palce_bid(GenericAPIView , CreateModelMixin) :
             bid = Bid.objects.create(
                 auction=auction,
                 amount=amount,
-                user = request.User
+                user = request.user
             )
 
             auction.current_price = amount
@@ -80,5 +87,6 @@ class palce_bid(GenericAPIView , CreateModelMixin) :
                     "user":request.user
                 }
             )
+            
             return Response("bid created.." , status=status.HTTP_201_CREATED)
         return Response(serializer.errors , status=status.HTTP_404_NOT_FOUND)
