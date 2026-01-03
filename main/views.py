@@ -57,7 +57,7 @@ class auction_detail_view(APIView) :
 
 class palce_bid(GenericAPIView , CreateModelMixin) :
     serializer_class = bid_serializer
-
+    # renderer_classes = [ ]
     def post(self, request, auction_id) :
        
         auction = get_object_or_404(Auction , id=auction_id)
