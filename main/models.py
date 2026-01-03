@@ -22,10 +22,21 @@ class Auction(models.Model) :
     product = models.ForeignKey(Product, on_delete=models.PROTECT, related_name='auction', null=True)
 
     def __str__(self) :
-        return f"{self.name} , {self.product.name}"
-
-    def __str__(self) :
         return self.name
+
+    def place_bid(self, user, amount) :
+        if amount > self.current_price :
+            self.current_price = amount
+            self.save()
+            bid = Bid.objects.create(
+                user=user,
+                auction=self,
+                amount=amount
+            )
+            self.current_price = amount
+            self.save()
+            return bid
+        raise ValueError("Bid amount must be greater than current price")
 
 class Bid(models.Model) :
     user    = models.ForeignKey(User , on_delete=models.CASCADE)

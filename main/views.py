@@ -65,20 +65,11 @@ class palce_bid(GenericAPIView , CreateModelMixin) :
         if serializer.is_valid() :
             
             amount = serializer.validated_data["amount"]     
-            if amount <= auction.current_price :
-                return Response({
-                    "error" : "amount should be great than current place"
-                })
-            
-            bid = Bid.objects.create(
-                auction=auction,
-                amount=amount,
-                user = request.user
-            )
-
-            auction.current_price = amount
-            auction.save()
-
+            try :
+                bid = auction.place_bid(request.user , amount)
+            except ValueError as e :
+                return Response({"error":str(e)} , status=status.HTTP_400_BAD_REQUEST)
+            # broadcast the new bid to the auction group
             channel_layer = get_channel_layer()
             async_to_sync(channel_layer.group_send)(
                 f"auction_{auction.id}",{
