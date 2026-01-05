@@ -35,7 +35,6 @@ CSRF_TRUSTED_ORIGINS = [
 
 INSTALLED_APPS = [
     "daphne",
-  
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     "channels",
-    'main',
     'rest_framework',
     'corsheaders'
 ]
