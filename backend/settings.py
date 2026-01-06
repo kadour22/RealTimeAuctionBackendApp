@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 from pathlib import Path
 from datetime import timedelta
+from celery.schedules import crontab
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -45,6 +46,7 @@ INSTALLED_APPS = [
     'auctions',
     'bids',
     'rest_framework',
+    'django_celery_beat',
     'corsheaders'
 ]
 
@@ -77,6 +79,7 @@ TEMPLATES = [
     },
 ]
 ASGI_APPLICATION = 'backend.asgi.application'
+
 CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
@@ -85,6 +88,10 @@ CHANNEL_LAYERS = {
         },
     },
 }
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
@@ -134,7 +141,7 @@ STATIC_URL  = 'static/'
 STATIC_ROOT = os.path.join(BASE_DIR , 'static') 
 MEDIA_URL = 'media/'
 MEDIA_ROOT = os.path.join(BASE_DIR , 'media') 
-
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
@@ -186,4 +193,12 @@ SIMPLE_JWT = {
     "CHECK_REVOKE_TOKEN": False,
     "REVOKE_TOKEN_CLAIM": "hash_password",
     "CHECK_USER_IS_ACTIVE": True,
+}
+
+
+CELERY_BEAT_SCHEDULE = {
+    'run-every-minute': {
+        'task': 'auctions.tasks.check_auction_timing',
+        'schedule': crontab(minute='*/1'),
+    },
 }

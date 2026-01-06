@@ -4,7 +4,7 @@ from django.utils import timezone
 
 @shared_task
 def check_auction_timing():
-    today = timezone.now().date()
+    today = timezone.now()
     auctions = Auction.objects.all()
     for auction in auctions:
         if auction.start_date and auction.end_date:
