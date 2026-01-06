@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'bids',
     'rest_framework',
     'django_celery_beat',
+    'notifications',
     'corsheaders'
 ]
 
