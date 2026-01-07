@@ -21,6 +21,7 @@ def send_notification(sender, instance, created, **kwargs) :
             {
                 "type":"new_notification",
                 "message":notify.message,
+                "is_read":notify.is_read,
                 "created_at":notify.created_at.isoformat()
             }
         )
