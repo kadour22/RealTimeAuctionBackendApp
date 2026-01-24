@@ -15,7 +15,6 @@ class auction_consumer(AsyncWebsocketConsumer):
         print(f"WebSocket disconnected for auction {self.auction_id}")
     
     async def place_new_bid(self, event):
-        # Send message to WebSocket as JSON string
         message = {
             "type": "place_new_bid",
             "amount": event["amount"],
